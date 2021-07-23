@@ -1,14 +1,14 @@
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.file.Files;         //used for manipulating(creating,copy,delete) files
+import java.nio.file.Paths;         // get location(name,root,parent,path) in particular file system
+import java.util.HashSet;           //implements the Set interface, backed by a hash table.
+import java.util.Set;               
 import java.util.Vector;
 
 class CHUNK{
-    int s;
+    int s;//start of file,with respect to original file
     String fname;
-    int e;
+    int e;//end of file w.r.t. original file
 }
 
 class KeyGenerator {
@@ -82,7 +82,7 @@ class Encryptor extends Cryptography {
     }
 
     int process(int data) {
-
+        //en-cryption logic 
         data = data ^ numericKey.get(numericKey_index);
         numericKey_index = (numericKey_index + 1) % (KeyGenerator.KEY_LENGTH);
 
@@ -153,7 +153,7 @@ class ChunkProcessor extends Thread {
             System.out.println("file opened successfully");
 
 
-            //ensure that chunk is read within the limits
+            // ensure that chunk is read within the limits
             //src_handle.seek(0);
             src_handle.seek(this.start_pos);
             int x = this.start_pos;
@@ -191,21 +191,25 @@ class FileProcessor{
     }
     void process() throws IOException, InterruptedException {
 
-        int n = 4;  //       # number of chunks
+        int n = 4;  //       number of chunks
         CHUNK[] chunks;
-        chunks = this.divide_into_chunks(n);
-        Vector<ChunkProcessor> cps = new Vector<>();
+        chunks = this.divide_into_chunks(n); //divide the source file into n chunks(files)
+        Vector<ChunkProcessor> cps = new Vector<>();//vector to contain meta data of n chunked files.
         System.out.println("chunking done!!");
 
 
         for (CHUNK ch : chunks){
+            //if encryption is to be done
             if (this.action == 'E') {
+                //through this constructor numericKey and color are genereated that are used in encryption 
                 Encryptor objE = new Encryptor(this.user_key);
-
+                 
+                //this chunkprocessor's constructor encrypts the 'ch' chunk
                 cps.add(new ChunkProcessor(this.src_file_name, ch.fname, ch.s, ch.e, objE));
 
 
             }
+            //if decryption is to be done
             else if( this.action == 'D'){
                 Decryptor objD = new Decryptor(this.user_key);
                 cps.add(new ChunkProcessor(this.src_file_name, ch.fname, ch.s, ch.e, objD));
@@ -283,18 +287,20 @@ class FileProcessor{
 
 public class App {
     public static void main(String[] args) throws IOException, InterruptedException {
-        String sfname ="D:/images/curry.jpg";
-        String efname = "D:/images/encrycurry.jpg";
-        String tfname = "D:/images/decryCurry.jpg";
-        String user_key = "Where is the smallest island?";
+        String sfname ="D:/images/curry.jpg";               //source file
+        String efname = "D:/images/encrycurry.jpg";         //encrypted file
+        String tfname = "D:/images/decryCurry.jpg";         //decrypted file
+        String user_key = "Where is the smallest island?";  
 
-        FileProcessor fp1 = new FileProcessor(sfname, efname, 'E', user_key);
-        fp1.process();
+        FileProcessor fp1 = new FileProcessor(sfname, efname, 'E', user_key); 
+        //encryption of source file, result in encrypted file
+        fp1.process();          
 
         System.out.println("-------------------------");
 
         //hyuser_key='this is not me here playunhg'
         FileProcessor fp2 = new FileProcessor(efname, tfname, 'D', user_key);
+        //decrypting the efname file ans give tfname as output
         fp2.process();
     }
 }
