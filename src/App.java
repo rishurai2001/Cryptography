@@ -12,8 +12,8 @@ class CHUNK{
 }
 
 class KeyGenerator {
-    public static int []ARMSTRONG_DIGITS ={1,5,3,3,7,0,3,7,1,4,0,7};
-    public static int KEY_LENGTH = ARMSTRONG_DIGITS.length;
+    public static int []KEY_DIGITS ={1,5,9,3,4,7,2,7,6,8,0};
+    public static int KEY_LENGTH = KEY_DIGITS.length;
     Vector<Integer> numerickey =new Vector<>();
     Set<Integer>st=new HashSet<>();
     KeyGenerator( String user_remark) {
@@ -35,7 +35,7 @@ class KeyGenerator {
 
 
         for (int i = 0; i < KEY_LENGTH; i++) {
-             numerickey.set( i,(ARMSTRONG_DIGITS[i]+numerickey.get(i))%256 );
+             numerickey.set( i,(KEY_DIGITS[i]+numerickey.get(i))%256 );
         }
         numerickey.add(sum);
     }
